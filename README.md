@@ -1,4 +1,4 @@
-# AR-VR-SpellCasting 🎮🪄
+# DraftMaster AI
 
 An AI-powered assistant for League of Legends players that provides champion picks with high winning rate in a given a scenario by still considering player preferences and main champions, 
 optimal item builds, spell upgrade paths, and more—based on your team composition and enemy draft. 
