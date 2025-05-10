@@ -1,7 +1,8 @@
 # DraftMaster AI
 
-An AI-powered assistant for League of Legends players that provides champion picks with high winning rate in a given a scenario by still considering player preferences and main champions, 
-optimal item builds, spell upgrade paths, and more—based on your team composition and enemy draft. 
+An AI-powered assistant for League of Legends players that recommends champion picks with high win rates for a given scenario, 
+while still considering player preferences and main champions. 
+It also suggests optimal item builds, spell upgrade paths, and more, all based on team composition and enemy draft. 
 Designed to support strategic decision-making during draft planning or in real-time (planned).
 
 ---
