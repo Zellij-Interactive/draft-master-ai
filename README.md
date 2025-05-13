@@ -1,35 +1,58 @@
-# DraftMaster AI
+# League of Legends Pre-Game Analysis Tool
 
-DraftMaster AI is a web-based application that uses multiple large language models (LLMs) 
-to assist League of Legends players in making strategic pre- and in-game decisions during the champion draft phase or in real-time (planned). 
-The tool recommends optimal champion picks, item builds, and spell upgrade paths, 
-based on team and enemy composition, while also factoring in player preferences like main champions.
-
----
+An AI-powered application that provides comprehensive pre-game analysis for League of Legends players.
 
 ## Features
 
-- Smart champion recommendations using GPT-based prompt engineering and eventualy RIOT Games API.
-- Context-aware item build suggestions.
-- Optimized spell-leveling paths.
-- Draft synergy and counter-pick analysis.
-- Streamlit web interface for ease of use.
+- Team composition analysis with strengths, weaknesses, and win conditions
+- Player-specific insights based on champion selection and match history
+- Lane matchup analysis with tips and counter strategies
+- Beautiful, League of Legends-themed UI with responsive design
 
-## Technologies
+## Requirements
 
-- OpenAI GPT API
+- Python 3.9+
 - Streamlit
-- League of Legends game data and RIOT Games API (champions, items, meta)
-- (Optionally: Google APIs or similar AI providers for enhancement if needed)
+- OpenAI API key
 
-## Academic Context
+## Getting Started
 
-University of Applied Sciences Mainz
+1. Clone this repository
+2. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+3. Create a `.env` file based on `.env.example` and add your OpenAI API key:
+   ```
+   OPENAI_API_KEY=your_openai_api_key_here
+   ```
+4. Run the application:
+   ```
+   streamlit run app.py
+   ```
 
-Department of Technology, Applied Computer Science
+## Usage
 
-Supervisor: Prof. Dr. Jens Heidrich
+1. Enter your summoner name and region
+2. Select champions for both blue and red teams
+3. Choose your analysis perspective (Blue or Red team)
+4. Click "Generate Analysis" to get comprehensive pre-game insights
 
-Developers: Karim Ouhammi and Walid Beladdad
+## Project Structure
 
-Demo: "to be added later on"
+- `app.py`: Main Streamlit application
+- `components/`: UI components for different sections
+- `utils/`: Utility functions for data and API calls
+- `static/`: CSS and static assets
+
+## Note
+
+This is a demonstration application. In a production environment, you would need to:
+1. Integrate with the official Riot Games API
+2. Implement caching and rate limiting
+3. Add user authentication
+4. Optimize API calls to reduce costs
+
+## License
+
+MIT
