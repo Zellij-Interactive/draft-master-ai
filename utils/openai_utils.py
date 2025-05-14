@@ -7,6 +7,7 @@ import json
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # System prompts for different analysis types
+
 SYSTEM_PROMPTS = {
     "team_analysis": """
     You are an expert League of Legends analyst specializing in team compositions. 
