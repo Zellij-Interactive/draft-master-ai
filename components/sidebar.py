@@ -22,7 +22,7 @@ def render_sidebar():
         region = st.selectbox(
             "Region",
             options=get_regions(),
-            index=get_regions().index(st.session_state.get("region", "NA"))
+            index=get_regions().index(st.session_state.get("region", "NA1"))
         )
         
         # Team composition
@@ -166,22 +166,36 @@ def render_sidebar():
                 
                 # Set analysis performed flag
                 st.session_state.analysis_performed = True
-                
+        
         # Reset button
         if st.button("Reset Analysis", type="secondary"):
             reset_analysis()
             st.experimental_rerun()
         
-        # API key info (only if not set)
+        # API key configuration section
+        st.markdown("---")
+        st.markdown("### API Configuration")
+        
+        # OpenAI API key input
         if not st.session_state.get("OPENAI_API_KEY"):
-            st.markdown("---")
-            st.markdown("### API Key Configuration")
             st.info(
-                "To generate real analysis, you need to set your OpenAI API key. "
+                "To generate analysis, you need to set your OpenAI API key. "
                 "You can add it to a .env file with OPENAI_API_KEY=your_key."
             )
             
-            api_key = st.text_input("OpenAI API Key", type="password")
-            if api_key:
-                st.session_state.OPENAI_API_KEY = api_key
-                st.success("API key set for this session!")
+            openai_api_key = st.text_input("OpenAI API Key", type="password", key="openai_key")
+            if openai_api_key:
+                st.session_state.OPENAI_API_KEY = openai_api_key
+                st.success("OpenAI API key set for this session!")
+        
+        # Riot API key input
+        if not st.session_state.get("RIOT_API_KEY"):
+            st.info(
+                "To fetch real summoner data, you need to set your Riot API key. "
+                "You can add it to a .env file with RIOT_API_KEY=your_key."
+            )
+            
+            riot_api_key = st.text_input("Riot API Key", type="password", key="riot_key")
+            if riot_api_key:
+                st.session_state.RIOT_API_KEY = riot_api_key
+                st.success("Riot API key set for this session!")

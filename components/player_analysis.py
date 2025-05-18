@@ -13,13 +13,24 @@ def render_player_analysis():
     
     # Get summoner data
     summoner_name = st.session_state.get("summoner_name", "")
-    region = st.session_state.get("region", "NA")
+    region = st.session_state.get("region", "NA1")
     
     if not summoner_name:
         st.warning("Summoner name is not available.")
         return
     
+    # Check if Riot API key is set
+    if not st.session_state.get("RIOT_API_KEY"):
+        st.error("Riot API key not found. Please set your API key in the sidebar.")
+        return
+    
+    # Get summoner data with error handling
     summoner_data = get_summoner_data(summoner_name, region)
+    
+    # Check if summoner data is empty (API error)
+    if not summoner_data:
+        st.error("Unable to fetch summoner data. Please check your Riot API key and try again.")
+        return
     
     # Player header with summoner info
     st.markdown(
@@ -48,13 +59,13 @@ def render_player_analysis():
         )
     
     with col2:
-        # Summoner info
+        # Summoner info with safe gets
         st.markdown(
             f"""
             <div style="padding: 10px;">
-                <h3 style="color: var(--lol-gold); margin-bottom: 5px;">{summoner_data['name']}</h3>
-                <p>Level: {summoner_data['level']} | Rank: {summoner_data['rank']}</p>
-                <p>Win Rate: {summoner_data['winRate']} | Main Role: {summoner_data['mainRole']}</p>
+                <h3 style="color: var(--lol-gold); margin-bottom: 5px;">{summoner_data.get('name', 'Unknown')}</h3>
+                <p>Level: {summoner_data.get('level', 'N/A')} | Rank: {summoner_data.get('rank', 'Unranked')}</p>
+                <p>Win Rate: {summoner_data.get('winRate', '0%')} | Main Role: {summoner_data.get('mainRole', 'Unknown')}</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -64,48 +75,56 @@ def render_player_analysis():
         # Top champions
         st.markdown("<div style='text-align: center;'><h4>Top Champions</h4></div>", unsafe_allow_html=True)
         
-        for champion in summoner_data['topChampions'][:3]:
-            icon_url = get_champion_icon_url(champion)
-            st.markdown(
-                f"""
-                <div style="display: flex; align-items: center; margin: 5px 0;">
-                    <img src="{icon_url}" width="24" height="24" class="champion-icon" style="margin-right: 10px;">
-                    <span>{champion}</span>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+        top_champions = summoner_data.get('topChampions', [])
+        if top_champions:
+            for champion in top_champions[:3]:
+                icon_url = get_champion_icon_url(champion)
+                if icon_url:  # Only show if we got a valid icon URL
+                    st.markdown(
+                        f"""
+                        <div style="display: flex; align-items: center; margin: 5px 0;">
+                            <img src="{icon_url}" width="24" height="24" class="champion-icon" style="margin-right: 10px;">
+                            <span>{champion}</span>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+        else:
+            st.markdown("<p>No champion data available</p>", unsafe_allow_html=True)
     
     # Recent matches section
     st.markdown("<hr style='margin: 20px 0;'>", unsafe_allow_html=True)
     st.markdown("<h3 style='color: var(--lol-gold);'>Recent Matches</h3>", unsafe_allow_html=True)
     
-    # Limit to 5 recent matches
-    recent_matches = summoner_data['recentMatches'][:5]
+    # Get recent matches with fallback
+    recent_matches = summoner_data.get('recentMatches', [])
     
-    # Create a row for recent matches
-    match_cols = st.columns(len(recent_matches))
-    
-    for i, match in enumerate(recent_matches):
-        with match_cols[i]:
-            # Set color based on result
-            result_color = "var(--success-color)" if match['result'] == "Victory" else "var(--danger-color)"
-            
-            # Get champion icon
-            icon_url = get_champion_icon_url(match['champion'])
-            
-            st.markdown(
-                f"""
-                <div style="text-align: center; padding: 10px; background-color: var(--lol-blue-light); 
-                            border-radius: 5px; border-left: 3px solid {result_color};">
-                    <img src="{icon_url}" width="40" height="40" style="border-radius: 50%; margin-bottom: 5px;">
-                    <p style="margin: 5px 0; font-weight: bold; color: {result_color};">{match['result']}</p>
-                    <p>KDA: {match['kda']}</p>
-                    <p>CS: {match['cs']}</p>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+    if recent_matches:
+        # Create a row for recent matches
+        match_cols = st.columns(len(recent_matches[:5]))  # Limit to 5 matches
+        
+        for i, match in enumerate(recent_matches[:5]):
+            with match_cols[i]:
+                # Set color based on result
+                result_color = "var(--success-color)" if match.get('result') == "Victory" else "var(--danger-color)"
+                
+                # Get champion icon
+                icon_url = get_champion_icon_url(match.get('champion', ''))
+                
+                st.markdown(
+                    f"""
+                    <div style="text-align: center; padding: 10px; background-color: var(--lol-blue-light); 
+                                border-radius: 5px; border-left: 3px solid {result_color};">
+                        <img src="{icon_url}" width="40" height="40" style="border-radius: 50%; margin-bottom: 5px;">
+                        <p style="margin: 5px 0; font-weight: bold; color: {result_color};">{match.get('result', 'Unknown')}</p>
+                        <p>KDA: {match.get('kda', '0/0/0')}</p>
+                        <p>CS: {match.get('cs', '0')}</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+    else:
+        st.info("No recent matches available")
     
     # Champion-specific analysis
     st.markdown("<hr style='margin: 20px 0;'>", unsafe_allow_html=True)
@@ -135,18 +154,19 @@ def render_player_analysis():
     # Champion analysis header
     icon_url = get_champion_icon_url(player_champion)
     
-    st.markdown(
-        f"""
-        <div style="display: flex; align-items: center; margin-bottom: 20px;">
-            <img src="{icon_url}" width="64" height="64" style="border-radius: 50%; margin-right: 15px; border: 2px solid var(--lol-gold);">
-            <div>
-                <h3 style="color: var(--lol-gold); margin: 0;">{player_champion} Analysis</h3>
-                <p style="margin: 5px 0 0 0;">Position: {player_position}</p>
+    if icon_url:
+        st.markdown(
+            f"""
+            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                <img src="{icon_url}" width="64" height="64" style="border-radius: 50%; margin-right: 15px; border: 2px solid var(--lol-gold);">
+                <div>
+                    <h3 style="color: var(--lol-gold); margin: 0;">{player_champion} Analysis</h3>
+                    <p style="margin: 5px 0 0 0;">Position: {player_position}</p>
+                </div>
             </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+            """,
+            unsafe_allow_html=True
+        )
     
     # Player analysis summary
     st.markdown(

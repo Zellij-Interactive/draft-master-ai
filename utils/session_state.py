@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 
 def initialize_session_state():
     """Initialize session state variables if they don't exist"""
@@ -6,7 +7,7 @@ def initialize_session_state():
         st.session_state.summoner_name = ""
     
     if "region" not in st.session_state:
-        st.session_state.region = "NA"
+        st.session_state.region = "EUW1"  # Updated to match Riot API region format
     
     if "analysis_performed" not in st.session_state:
         st.session_state.analysis_performed = False
@@ -23,6 +24,13 @@ def initialize_session_state():
             "player_analysis": {},
             "matchup_insights": {}
         }
+    
+    # Initialize API keys from environment variables
+    if "OPENAI_API_KEY" not in st.session_state:
+        st.session_state.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    
+    if "RIOT_API_KEY" not in st.session_state:
+        st.session_state.RIOT_API_KEY = os.getenv("RIOT_API_KEY")
 
 def reset_analysis():
     """Reset analysis data"""
