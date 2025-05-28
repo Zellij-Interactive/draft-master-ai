@@ -125,7 +125,7 @@ def render_matchup_insights():
                     <div style="margin-top: 15px;">
                         <h4 style="color: var(--lol-gold);">Key Tips</h4>
                         <ul>
-                        {"".join([f"<li>{tip}</li>" for tip in matchup.get("tips", ["No tips available"])])}
+                            {"".join([f"<li>{tip}</li>" for tip in matchup.get("tips", ["No tips available"])])}
                         </ul>
                     </div>
                     
