@@ -37,7 +37,7 @@ def create_chat_chain(file_path: str):
     text_chunks = []
     for section, content in analysis_data.items():
         text_chunks.append(f"{section}: {json.dumps(content, indent=2)}")
-    
+        print(f"{section}: {json.dumps(content, indent=2)}")
     # Create vector store
     docsearch = FAISS.from_texts(text_chunks, embeddings)
     

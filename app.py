@@ -63,7 +63,7 @@ def main():
             with st.chat_message("user"):
                 st.write(message[0])
             with st.chat_message("assistant"):
-                st.write(message[1])
+                st.markdown(f'<div style="color: white;">{message[1]}</div>', unsafe_allow_html=True)
         
         # Get user input
         if prompt := st.chat_input("Ask questions about the analysis data..."):
@@ -75,7 +75,7 @@ def main():
                 response = answer_question(qa_chain, prompt, st.session_state.chat_history)
             
             with st.chat_message("assistant"):
-                st.write(response)
+                st.markdown(f'<div style="color: white;">{response}</div>', unsafe_allow_html=True)
             
             # Update chat history
             st.session_state.chat_history.append((prompt, response))
