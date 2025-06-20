@@ -31,6 +31,17 @@ def initialize_session_state():
     
     if "RIOT_API_KEY" not in st.session_state:
         st.session_state.RIOT_API_KEY = os.getenv("RIOT_API_KEY")
+    
+    # Initialize new AI API keys
+    if "GEMINI_API_KEY" not in st.session_state:
+        st.session_state.GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    
+    if "YOUTUBE_API_KEY" not in st.session_state:
+        st.session_state.YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+    
+    # Initialize patch analysis cache
+    if "current_patch_analysis" not in st.session_state:
+        st.session_state.current_patch_analysis = {}
 
 def reset_analysis():
     """Reset analysis data"""

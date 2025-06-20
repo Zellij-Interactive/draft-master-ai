@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 
 from components.sidebar import render_sidebar
+from components.enhanced_welcome import render_enhanced_welcome
 from utils.langchain_utils import save_analysis_to_file, create_chat_chain, answer_question
 from components.header import render_header
 from components.team_analysis import render_team_analysis
@@ -92,31 +93,8 @@ def main():
         with tabs[2]:
             render_matchup_insights()
     else:
-        # Welcome screen
-        st.markdown("""
-        <div class="welcome-container">
-            <h2>Welcome to LoL Pre-Game Analysis</h2>
-            <p>Enter your summoner name and team information in the sidebar to get started.</p>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h3>Team Composition</h3>
-                    <p>Analyze team synergies and weaknesses</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Player Insights</h3>
-                    <p>Review performance stats and tendencies</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Matchup Analysis</h3>
-                    <p>Get lane-specific tips and strategies</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Win Predictions</h3>
-                    <p>AI-powered match outcome forecasting</p>
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Enhanced welcome screen with patch info and videos
+        render_enhanced_welcome()
 
 if __name__ == "__main__":
     main()

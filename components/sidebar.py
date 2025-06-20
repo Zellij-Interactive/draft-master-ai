@@ -174,12 +174,38 @@ def render_sidebar():
         
         # API key configuration section
         st.markdown("---")
-        st.markdown("### API Configuration")
+        st.markdown("### 🤖 AI Configuration")
+        
+        # Gemini API key input
+        if not st.session_state.get("GEMINI_API_KEY"):
+            st.info(
+                "🔥 **New!** Add your Gemini API key for AI-powered patch analysis and meta insights. "
+                "[Get free API key](https://makersuite.google.com/app/apikey)"
+            )
+            
+            gemini_api_key = st.text_input("Gemini API Key", type="password", key="gemini_key")
+            if gemini_api_key:
+                st.session_state.GEMINI_API_KEY = gemini_api_key
+                st.success("🤖 Gemini API key set! Refresh to see patch analysis.")
+        else:
+            st.success("✅ Gemini API connected")
+            if st.button("🔄 Reset Gemini Key"):
+                del st.session_state.GEMINI_API_KEY
+                st.experimental_rerun()
+        
+        # YouTube API key input (optional)
+        if not st.session_state.get("YOUTUBE_API_KEY"):
+            with st.expander("📺 YouTube Integration (Optional)"):
+                st.info("Add YouTube API key for video content integration")
+                youtube_api_key = st.text_input("YouTube API Key", type="password", key="youtube_key")
+                if youtube_api_key:
+                    st.session_state.YOUTUBE_API_KEY = youtube_api_key
+                    st.success("📺 YouTube API key set!")
         
         # OpenAI API key input
         if not st.session_state.get("OPENAI_API_KEY"):
             st.info(
-                "To generate analysis, you need to set your OpenAI API key. "
+                "To generate detailed analysis, you need to set your OpenAI API key. "
                 "You can add it to a .env file with OPENAI_API_KEY=your_key."
             )
             
