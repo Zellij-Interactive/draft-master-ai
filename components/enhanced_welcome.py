@@ -3,8 +3,31 @@ from utils.gemini_api import GeminiMetaAnalyzer, VideoContentFetcher
 from utils.lol_data import get_champion_icon_url
 
 def render_enhanced_welcome():
-    """Render enhanced welcome page with AI-powered patch analysis"""
+    """Render enhanced welcome page with AI-powered patch analysis and autoplay patch video"""
     
+    # --- Autoplay Patch Video Section ---
+    st.markdown("### 🎬 Latest Patch Video (Autoplay)")
+    # Try to get the latest patch version from session state, fallback to '14.1'
+    patch_version = st.session_state.get('current_patch_analysis', {}).get('version', '14.1')
+    video_fetcher = VideoContentFetcher(st.session_state.get("YOUTUBE_API_KEY"))
+    videos = video_fetcher.get_patch_videos(patch_version)
+    if videos:
+        # Extract video ID from the URL
+        import re
+        video_url = videos[0]['url']
+        match = re.search(r"v=([\w-]+)", video_url)
+        video_id = match.group(1) if match else None
+        if video_id:
+            st.markdown(f'''
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/{video_id}?autoplay=1&mute=1&controls=1" 
+            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            ''', unsafe_allow_html=True)
+        else:
+            st.info("Could not extract video ID for autoplay.")
+    else:
+        st.info("No patch videos found to autoplay.")
+    # --- End Autoplay Section ---
+
     # Welcome header
     st.markdown("""
     <div class="welcome-container">
