@@ -27,7 +27,7 @@ if os.path.exists(""):
 
 # App configuration
 st.set_page_config(
-    page_title="DraftMasterAI LoL Pre-Game Analysis",
+    page_title="DraftMasterAI a LoL Pre-Game Analysis",
     page_icon="🎮",
     layout="wide",
     initial_sidebar_state="expanded",
