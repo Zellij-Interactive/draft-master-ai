@@ -47,7 +47,3 @@ This document explains how the new welcome experience and always-English Patch V
    - Patch analysis, patch videos, trending champions, and features grid are displayed.
    - Patch video descriptions are always in English if a Gemini API key is set.
 3. **User can proceed to analysis by entering details and clicking the relevant buttons.**
-
----
-
-For further customization or technical deep dives (e.g., how to add more languages, use OpenAI instead of Gemini, or optimize API calls), see the relevant files or ask your AI assistant!
