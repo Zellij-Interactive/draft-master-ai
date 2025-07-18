@@ -22,7 +22,7 @@ def render_sidebar():
         region = st.selectbox(
             "Region",
             options=get_regions(),
-            index=get_regions().index(st.session_state.get("region", "NA"))
+            index=get_regions().index(st.session_state.get("region", "NA1"))
         )
         
         # Team composition
@@ -166,22 +166,62 @@ def render_sidebar():
                 
                 # Set analysis performed flag
                 st.session_state.analysis_performed = True
-                
+        
         # Reset button
         if st.button("Reset Analysis", type="secondary"):
             reset_analysis()
             st.experimental_rerun()
         
-        # API key info (only if not set)
-        if not st.session_state.get("OPENAI_API_KEY"):
-            st.markdown("---")
-            st.markdown("### API Key Configuration")
+        # API key configuration section
+        st.markdown("---")
+        st.markdown("### 🤖 AI Configuration")
+        
+        # Gemini API key input
+        if not st.session_state.get("GEMINI_API_KEY"):
             st.info(
-                "To generate real analysis, you need to set your OpenAI API key. "
+                "🔥 **New!** Add your Gemini API key for AI-powered patch analysis and meta insights. "
+                "[Get free API key](https://makersuite.google.com/app/apikey)"
+            )
+            
+            gemini_api_key = st.text_input("Gemini API Key", type="password", key="gemini_key")
+            if gemini_api_key:
+                st.session_state.GEMINI_API_KEY = gemini_api_key
+                st.success("🤖 Gemini API key set! Refresh to see patch analysis.")
+        else:
+            st.success("✅ Gemini API connected")
+            if st.button("🔄 Reset Gemini Key"):
+                del st.session_state.GEMINI_API_KEY
+                st.experimental_rerun()
+        
+        # YouTube API key input (optional)
+        if not st.session_state.get("YOUTUBE_API_KEY"):
+            with st.expander("📺 YouTube Integration (Optional)"):
+                st.info("Add YouTube API key for video content integration")
+                youtube_api_key = st.text_input("YouTube API Key", type="password", key="youtube_key")
+                if youtube_api_key:
+                    st.session_state.YOUTUBE_API_KEY = youtube_api_key
+                    st.success("📺 YouTube API key set!")
+        
+        # OpenAI API key input
+        if not st.session_state.get("OPENAI_API_KEY"):
+            st.info(
+                "To generate detailed analysis, you need to set your OpenAI API key. "
                 "You can add it to a .env file with OPENAI_API_KEY=your_key."
             )
             
-            api_key = st.text_input("OpenAI API Key", type="password")
-            if api_key:
-                st.session_state.OPENAI_API_KEY = api_key
-                st.success("API key set for this session!")
+            openai_api_key = st.text_input("OpenAI API Key", type="password", key="openai_key")
+            if openai_api_key:
+                st.session_state.OPENAI_API_KEY = openai_api_key
+                st.success("OpenAI API key set for this session!")
+        
+        # Riot API key input
+        if not st.session_state.get("RIOT_API_KEY"):
+            st.info(
+                "To fetch real summoner data, you need to set your Riot API key. "
+                "You can add it to a .env file with RIOT_API_KEY=your_key."
+            )
+            
+            riot_api_key = st.text_input("Riot API Key", type="password", key="riot_key")
+            if riot_api_key:
+                st.session_state.RIOT_API_KEY = riot_api_key
+                st.success("Riot API key set for this session!")

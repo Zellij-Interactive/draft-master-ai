@@ -2,102 +2,253 @@ import os
 import json
 import streamlit as st
 import requests
+from typing import Dict, List, Any
 
 # Champion data
 @st.cache_data
 def load_champion_list():
-    """Load list of LoL champions"""
-    # In a real app, this would fetch from Riot API
-    # For demo purposes, we use a static list
-    champions = [
-        "Aatrox", "Ahri", "Akali", "Akshan", "Alistar", "Amumu", "Anivia", "Annie", "Aphelios", 
-        "Ashe", "Aurelion Sol", "Azir", "Bard", "Bel'Veth", "Blitzcrank", "Brand", "Braum", 
-        "Caitlyn", "Camille", "Cassiopeia", "Cho'Gath", "Corki", "Darius", "Diana", "Dr. Mundo", 
-        "Draven", "Ekko", "Elise", "Evelynn", "Ezreal", "Fiddlesticks", "Fiora", "Fizz", "Galio", 
-        "Gangplank", "Garen", "Gnar", "Gragas", "Graves", "Gwen", "Hecarim", "Heimerdinger", 
-        "Illaoi", "Irelia", "Ivern", "Janna", "Jarvan IV", "Jax", "Jayce", "Jhin", "Jinx", 
-        "K'Sante", "Kai'Sa", "Kalista", "Karma", "Karthus", "Kassadin", "Katarina", "Kayle", 
-        "Kayn", "Kennen", "Kha'Zix", "Kindred", "Kled", "Kog'Maw", "LeBlanc", "Lee Sin", "Leona", 
-        "Lillia", "Lissandra", "Lucian", "Lulu", "Lux", "Malphite", "Malzahar", "Maokai", 
-        "Master Yi", "Miss Fortune", "Mordekaiser", "Morgana", "Nami", "Nasus", "Nautilus", 
-        "Neeko", "Nidalee", "Nilah", "Nocturne", "Nunu & Willump", "Olaf", "Orianna", "Ornn", 
-        "Pantheon", "Poppy", "Pyke", "Qiyana", "Quinn", "Rakan", "Rammus", "Rek'Sai", "Rell", 
-        "Renata Glasc", "Renekton", "Rengar", "Riven", "Rumble", "Ryze", "Samira", "Sejuani", 
-        "Senna", "Seraphine", "Sett", "Shaco", "Shen", "Shyvana", "Singed", "Sion", "Sivir", 
-        "Skarner", "Sona", "Soraka", "Swain", "Sylas", "Syndra", "Tahm Kench", "Taliyah", "Talon", 
-        "Taric", "Teemo", "Thresh", "Tristana", "Trundle", "Tryndamere", "Twisted Fate", "Twitch", 
-        "Udyr", "Urgot", "Varus", "Vayne", "Veigar", "Vel'Koz", "Vex", "Vi", "Viego", "Viktor", 
-        "Vladimir", "Volibear", "Warwick", "Wukong", "Xayah", "Xerath", "Xin Zhao", "Yasuo", 
-        "Yone", "Yorick", "Yuumi", "Zac", "Zed", "Zeri", "Ziggs", "Zilean", "Zoe", "Zyra"
-    ]
-    return sorted(champions)
+    """Load list of LoL champions from Data Dragon API"""
+    try:
+        # Get latest version
+        versions_url = "https://ddragon.leagueoflegends.com/api/versions.json"
+        versions_response = requests.get(versions_url)
+        versions_response.raise_for_status()
+        latest_version = versions_response.json()[0]
+        
+        # Get champion data
+        champions_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/data/en_US/champion.json"
+        champions_response = requests.get(champions_url)
+        champions_response.raise_for_status()
+        champions_data = champions_response.json()
+        
+        # Extract champion names and sort alphabetically
+        champion_list = sorted(champions_data["data"].keys())
+        return champion_list
+        
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error fetching champion data: {str(e)}")
+        # Fallback to empty list if API fails
+        return []
 
 @st.cache_data
 def get_champion_roles():
-    """Get default roles for champions"""
-    # This would typically come from an API or database
-    # For demo purposes, we use a static mapping
-    return {
-        "Top": ["Aatrox", "Camille", "Darius", "Fiora", "Gangplank", "Garen", "Gnar", "Gwen", 
-                "Illaoi", "Irelia", "Jax", "Jayce", "K'Sante", "Kayle", "Kennen", "Kled",
-                "Malphite", "Mordekaiser", "Nasus", "Ornn", "Pantheon", "Poppy", "Renekton",
-                "Riven", "Sett", "Shen", "Singed", "Sion", "Teemo", "Tryndamere", "Urgot",
-                "Volibear", "Wukong", "Yorick"],
-                
-        "Jungle": ["Amumu", "Bel'Veth", "Diana", "Ekko", "Elise", "Evelynn", "Fiddlesticks", 
-                  "Gragas", "Graves", "Hecarim", "Ivern", "Jarvan IV", "Karthus", "Kayn",
-                  "Kha'Zix", "Kindred", "Lee Sin", "Lillia", "Master Yi", "Nidalee", 
-                  "Nocturne", "Nunu & Willump", "Olaf", "Rammus", "Rek'Sai", "Rengar",
-                  "Sejuani", "Shaco", "Shyvana", "Skarner", "Trundle", "Udyr", "Vi",
-                  "Viego", "Warwick", "Xin Zhao", "Zac"],
-                  
-        "Mid": ["Ahri", "Akali", "Akshan", "Anivia", "Annie", "Aurelion Sol", "Azir", "Cassiopeia",
-               "Corki", "Fizz", "Galio", "Heimerdinger", "Kassadin", "Katarina", "LeBlanc",
-               "Lissandra", "Lux", "Malzahar", "Neeko", "Orianna", "Qiyana", "Ryze", "Sylas",
-               "Syndra", "Taliyah", "Talon", "Twisted Fate", "Veigar", "Vex", "Viktor",
-               "Vladimir", "Xerath", "Yasuo", "Yone", "Zed", "Ziggs", "Zoe"],
-               
-        "ADC": ["Aphelios", "Ashe", "Caitlyn", "Draven", "Ezreal", "Jhin", "Jinx", "Kai'Sa",
-               "Kalista", "Kog'Maw", "Lucian", "Miss Fortune", "Nilah", "Samira", "Sivir",
-               "Tristana", "Twitch", "Varus", "Vayne", "Xayah", "Zeri"],
-               
-        "Support": ["Alistar", "Bard", "Blitzcrank", "Brand", "Braum", "Janna", "Karma", "Leona",
-                   "Lulu", "Morgana", "Nami", "Nautilus", "Pyke", "Rakan", "Rell", "Renata Glasc",
-                   "Senna", "Seraphine", "Sona", "Soraka", "Tahm Kench", "Taric", "Thresh",
-                   "Yuumi", "Zilean", "Zyra"]
-    }
+    """Get champion roles from Data Dragon API"""
+    try:
+        # Get latest version
+        versions_url = "https://ddragon.leagueoflegends.com/api/versions.json"
+        versions_response = requests.get(versions_url)
+        versions_response.raise_for_status()
+        latest_version = versions_response.json()[0]
+        
+        # Get champion data
+        champions_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/data/en_US/champion.json"
+        champions_response = requests.get(champions_url)
+        champions_response.raise_for_status()
+        champions_data = champions_response.json()
+        
+        # Initialize role lists
+        roles = {
+            "Top": [],
+            "Jungle": [],
+            "Mid": [],
+            "ADC": [],
+            "Support": []
+        }
+        
+        # Map Data Dragon tags to roles
+        role_mapping = {
+            "Fighter": ["Top", "Jungle"],
+            "Tank": ["Top", "Support", "Jungle"],
+            "Mage": ["Mid", "Support"],
+            "Assassin": ["Mid", "Jungle"],
+            "Marksman": ["ADC"],
+            "Support": ["Support"]
+        }
+        
+        # Categorize champions by their tags
+        for champ_name, champ_data in champions_data["data"].items():
+            for tag in champ_data["tags"]:
+                for role in role_mapping.get(tag, []):
+                    if champ_name not in roles[role]:
+                        roles[role].append(champ_name)
+        
+        # Sort champions in each role
+        for role in roles:
+            roles[role].sort()
+        
+        return roles
+        
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error fetching champion roles: {str(e)}")
+        # Return empty role lists if API fails
+        return {role: [] for role in ["Top", "Jungle", "Mid", "ADC", "Support"]}
 
 def get_regions():
     """Get list of LoL regions"""
-    return ["NA", "EUW", "EUNE", "KR", "BR", "LAN", "LAS", "OCE", "RU", "TR", "JP"]
+    return ["NA1", "EUW1", "EUNE1", "KR", "BR1", "LA1", "LA2", "OC1", "RU", "TR1", "JP1"]
 
-def get_summoner_data(summoner_name, region):
-    """
-    Get summoner data from Riot API
-    In a real app, this would make API calls to Riot
-    For demo purposes, we return mock data
-    """
-    # This would typically come from Riot API
-    # For demo, we use mock data
-    return {
-        "name": summoner_name,
-        "level": 150,
-        "rank": "Gold II",
-        "winRate": "53%",
-        "mainRole": "Mid",
-        "topChampions": ["Ahri", "Zed", "Syndra"],
-        "recentMatches": [
-            {"champion": "Ahri", "result": "Victory", "kda": "8/2/10", "cs": 187},
-            {"champion": "Zed", "result": "Defeat", "kda": "4/5/3", "cs": 165},
-            {"champion": "Syndra", "result": "Victory", "kda": "6/1/7", "cs": 201},
-            {"champion": "Ahri", "result": "Victory", "kda": "10/4/9", "cs": 192},
-            {"champion": "Viktor", "result": "Defeat", "kda": "2/6/3", "cs": 154}
-        ]
+def get_region_routing(region: str) -> str:
+    """Get routing value for a region"""
+    region_routes = {
+        "NA1": "americas",
+        "BR1": "americas",
+        "LA1": "americas",
+        "LA2": "americas",
+        "EUW1": "europe",
+        "EUNE1": "europe",
+        "TR1": "europe",
+        "RU": "europe",
+        "KR": "asia",
+        "JP1": "asia",
+        "OC1": "sea"
     }
+    return region_routes.get(region, "americas")
+
+def get_summoner_data(summoner_name: str, region: str) -> Dict[str, Any]:
+    """Get summoner data from Riot API"""
+    # Get API key from session state first, then environment
+    api_key = st.session_state.get("RIOT_API_KEY") or os.getenv("RIOT_API_KEY")
+    
+    if not api_key:
+        st.error("Riot API key not found. Please set your API key in the sidebar.")
+        return {}
+
+    try:
+        # Base URLs
+        base_url = f"https://{region}.api.riotgames.com"
+        routing = get_region_routing(region)
+        region_url = f"https://{routing}.api.riotgames.com"
+        
+        # Headers
+        headers = {"X-Riot-Token": api_key}
+        
+        # Get summoner data
+        summoner_response = requests.get(
+            f"{base_url}/lol/summoner/v4/summoners/by-name/{summoner_name}",
+            headers=headers
+        )
+        summoner_response.raise_for_status()
+        summoner_data = summoner_response.json()
+        
+        # Get ranked data
+        ranked_response = requests.get(
+            f"{base_url}/lol/league/v4/entries/by-summoner/{summoner_data['id']}",
+            headers=headers
+        )
+        ranked_response.raise_for_status()
+        ranked_data = ranked_response.json()
+        
+        # Get match history
+        matches_response = requests.get(
+            f"{region_url}/lol/match/v5/matches/by-puuid/{summoner_data['puuid']}/ids",
+            params={"start": 0, "count": 5},
+            headers=headers
+        )
+        matches_response.raise_for_status()
+        match_ids = matches_response.json()
+        
+        # Process ranked data
+        solo_queue_data = next(
+            (queue for queue in ranked_data if queue["queueType"] == "RANKED_SOLO_5x5"),
+            None
+        )
+        
+        rank = "Unranked"
+        win_rate = "0%"
+        if solo_queue_data:
+            rank = f"{solo_queue_data['tier']} {solo_queue_data['rank']}"
+            total_games = solo_queue_data["wins"] + solo_queue_data["losses"]
+            win_rate = f"{(solo_queue_data['wins'] / total_games * 100):.1f}%" if total_games > 0 else "0%"
+        
+        # Get recent matches data
+        recent_matches = []
+        for match_id in match_ids:
+            match_response = requests.get(
+                f"{region_url}/lol/match/v5/matches/{match_id}",
+                headers=headers
+            )
+            match_response.raise_for_status()
+            match_data = match_response.json()
+            
+            # Find player in match
+            participant = next(
+                p for p in match_data["info"]["participants"]
+                if p["puuid"] == summoner_data["puuid"]
+            )
+            
+            recent_matches.append({
+                "champion": participant["championName"],
+                "result": "Victory" if participant["win"] else "Defeat",
+                "kda": f"{participant['kills']}/{participant['deaths']}/{participant['assists']}",
+                "cs": participant["totalMinionsKilled"] + participant.get("neutralMinionsKilled", 0)
+            })
+        
+        # Get mastery data for top champions
+        mastery_response = requests.get(
+            f"{base_url}/lol/champion-mastery/v4/champion-masteries/by-puuid/{summoner_data['puuid']}/top",
+            params={"count": 3},
+            headers=headers
+        )
+        mastery_response.raise_for_status()
+        mastery_data = mastery_response.json()
+        
+        # Get champion data to map IDs to names
+        versions_response = requests.get("https://ddragon.leagueoflegends.com/api/versions.json")
+        versions_response.raise_for_status()
+        latest_version = versions_response.json()[0]
+        
+        champions_response = requests.get(
+            f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/data/en_US/champion.json"
+        )
+        champions_response.raise_for_status()
+        champions_data = champions_response.json()["data"]
+        
+        # Map champion IDs to names
+        champion_id_to_name = {
+            int(champ_data["key"]): champ_name 
+            for champ_name, champ_data in champions_data.items()
+        }
+        
+        top_champions = [
+            champion_id_to_name[mastery["championId"]]
+            for mastery in mastery_data
+        ]
+        
+        # Determine main role based on recent matches and champion masteries
+        role_counts = {"Top": 0, "Jungle": 0, "Mid": 0, "ADC": 0, "Support": 0}
+        champion_roles = get_champion_roles()
+        
+        for champion in top_champions + [match["champion"] for match in recent_matches]:
+            for role, champions in champion_roles.items():
+                if champion in champions:
+                    role_counts[role] += 1
+        
+        main_role = max(role_counts.items(), key=lambda x: x[1])[0]
+        
+        return {
+            "name": summoner_data["name"],
+            "level": summoner_data["summonerLevel"],
+            "rank": rank,
+            "winRate": win_rate,
+            "mainRole": main_role,
+            "topChampions": top_champions,
+            "recentMatches": recent_matches
+        }
+            
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error fetching summoner data: {str(e)}")
+        return {}
 
 def get_champion_icon_url(champion_name):
-    """Get champion icon URL"""
-    # In a real app, this would use Riot's Data Dragon
-    # For demo, we use a placeholder pattern
-    sanitized_name = champion_name.replace("'", "").replace(" ", "").replace(".", "")
-    return f"https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/{sanitized_name}.png"
+    """Get champion icon URL from Data Dragon"""
+    try:
+        # Get latest version
+        versions_response = requests.get("https://ddragon.leagueoflegends.com/api/versions.json")
+        versions_response.raise_for_status()
+        latest_version = versions_response.json()[0]
+        
+        sanitized_name = champion_name.replace("'", "").replace(" ", "").replace(".", "")
+        return f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/champion/{sanitized_name}.png"
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error fetching champion icon URL: {str(e)}")
+        return ""
