@@ -53,6 +53,18 @@ This is a demonstration application. In a production environment, you would need
 3. Add user authentication
 4. Optimize API calls to reduce costs
 
+## Academic Context
+
+University of Applied Sciences Mainz
+
+Department of Technology, Applied Computer Science
+
+Supervisor: Prof. Dr. Jens Heidrich
+
+Developers: Karim Ouhammi and Walid Beladdad
+
+Demo: inc.
+
 ## License
 
 MIT
