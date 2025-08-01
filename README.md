@@ -55,16 +55,14 @@ This is a demonstration application. In a production environment, you would need
 
 ## Academic Context
 
-University of Applied Sciences Mainz
+- University of Applied Sciences Mainz
 
-Department of Technology, Applied Computer Science
+- Department of Technology, Applied Computer Science
 
-Supervisor: Prof. Dr. Jens Heidrich
+- **Supervisor:** Prof. Dr. Jens Heidrich
 
-Developers: Karim Ouhammi and Walid Beladdad
+- **Developers:** Karim Ouhammi and Walid Beladdad
 
-Demo: inc.
+- **Demo:** inc.
 
-## License
-
-MIT
+---
